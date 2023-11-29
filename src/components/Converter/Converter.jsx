@@ -4,30 +4,41 @@ import { StyledConverter, StyledForm, StyledTitel } from './StyledConverter';
 import CurrencyInput from '../CurrencyInput/CurrencyInput';
 import axios from 'axios';
 // const API_KEY = '52b45716cb0538baefb5f40db1764096';
-const API_URL = `http://data.fixer.io/api/latest?access_key=52b45716cb0538baefb5f40db1764096&base  =USD&symbols = USD,UAN,EUR,PLN,`;
+const API_URL = `http://data.fixer.io/api/latest?access_key=52b45716cb0538baefb5f40db1764096a&base  =USD&symbols = USD,UAN,EUR,PLN,`;
 const Converter = () => {
-  const [amountOne, setAmountOne] = useState(100);
-  const [amountTwo, setAmountTwo] = useState(100);
+  const [amountOne, setAmountOne] = useState();
+  const [amountTwo, setAmountTwo] = useState();
 
-  const [currencyOne, setCurrencyOne] = useState();
-  const [currencyTwo, setCurrencyTwo] = useState();
-
+  const [currencyOne, setCurrencyOne] = useState({
+    value: 'UAH',
+    label: 'UAH',
+  });
+  const [currencyTwo, setCurrencyTwo] = useState({
+    value: 'USD',
+    label: 'USD',
+  });
   const [currencyRates, setCurrencyRates] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  console.log('error: ', error);
 
-  const currencyOption = Object.keys(currencyRates)?.reduce((acc, item) => {
-    const optionItem = {};
-    optionItem.value = item;
-    optionItem.label = item;
-    acc.push(optionItem);
-    return acc;
-  }, []);
   useEffect(() => {
     const getCurrency = async () => {
       try {
+        setIsLoading(true);
         const res = await axios.get(API_URL);
+        console.log('res : ', res);
+
         setCurrencyRates(res.data.rates);
+        if (res.data.success === false) {
+          setIsLoading(false);
+          throw new Error(
+            "can't get exchange rate data, please try again later"
+          );
+        }
+        setIsLoading(false);
       } catch (error) {
-        console.log('error: ', error);
+        setError(error);
       }
     };
 
@@ -70,6 +81,14 @@ const Converter = () => {
     setAmountOne(exchangeResult);
     setCurrencyTwo(currencyTwo);
   };
+
+  if (isLoading) {
+    return <p>Looading data...</p>;
+  }
+  if (error) {
+    return <p>{`Sorry, ${error.message}`}</p>;
+  }
+
   return (
     <StyledConverter>
       <StyledTitel> Currency converter </StyledTitel>
@@ -79,7 +98,7 @@ const Converter = () => {
           value={amountOne}
           amountChange={handelAmountOneChange}
           currencyChange={handelcurrencyOneChange}
-          option={currencyOption}
+          currencyRates={currencyRates}
           setOptions={setCurrencyOne}
           selected={currencyOne}
         />
@@ -88,7 +107,7 @@ const Converter = () => {
           value={amountTwo}
           amountChange={handelAmountTwoChange}
           currencyChange={handelcurrencyTwoChange}
-          option={currencyOption}
+          currencyRates={currencyRates}
           setOptions={setCurrencyTwo}
           selected={currencyTwo}
         />
