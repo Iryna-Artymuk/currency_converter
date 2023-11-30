@@ -10,9 +10,9 @@ import CurrencyInput from '../CurrencyInput/CurrencyInput';
 // const API_KEY = '52b45716cb0538baefb5f40db1764096';
 const API_URL = `https://v6.exchangerate-api.com/v6/72f5042a3ed8d5c12026aab6/latest/USD`;
 const Converter = () => {
-  const [amountOne, setAmountOne] = useState();
+  const [amountOne, setAmountOne] = useState(1);
 
-  const [amountTwo, setAmountTwo] = useState();
+  const [amountTwo, setAmountTwo] = useState(1);
 
   const [currencyOne, setCurrencyOne] = useState({
     value: 'UAH',
@@ -22,8 +22,7 @@ const Converter = () => {
     value: 'USD',
     label: 'USD',
   });
-  const [currencyRates, setCurrencyRates] = useState([]);
-  console.log('currencyRates: ', currencyRates);
+  const [currencyRates, setCurrencyRates] = useState({});
 
   const [timeStamp, setTimeStamp] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,18 +33,18 @@ const Converter = () => {
       try {
         setIsLoading(true);
         const res = await axios.get(API_URL);
-        console.log('res : ', res.data);
 
         setTimeStamp(res.data.time_last_update_unix);
         setCurrencyRates(res.data.conversion_rates);
 
-        // if (res.data.success === false) {
-        //   throw new Error(
-        //     'exchange rate data cannot be retrieved, please try again later'
-        //   );
-        // }
+        if (res.result === 'error' || !res) {
+          throw new Error(
+            'exchange rate data cannot be retrieved, please try again later'
+          );
+        }
         setIsLoading(false);
       } catch (error) {
+        console.log('error: ', error);
         setError(error);
       } finally {
         setIsLoading(false);
@@ -65,6 +64,13 @@ const Converter = () => {
     setAmountTwo(exchangeResult);
     setAmountOne(amountOne);
   };
+
+  // handel first render convert
+  useEffect(() => {
+    if (Object.keys(currencyRates).length > 0) {
+      handelAmountOneChange(1);
+    }
+  }, [currencyRates]);
   const handelAmountTwoChange = (amountTwo) => {
     const exchangeResult = (
       (amountTwo * currencyRates[currencyOne.value]) /
@@ -96,7 +102,11 @@ const Converter = () => {
     return <Sppiner />;
   }
   if (error) {
-    return <ErrorMessage> {error.message}</ErrorMessage>;
+    return (
+      <ErrorMessage>
+        exchange rate data cannot be retrieved, please try again later
+      </ErrorMessage>
+    );
   }
 
   return (
@@ -105,7 +115,7 @@ const Converter = () => {
       <Time timeStamp={timeStamp} />
       <StyledForm>
         <CurrencyInput
-          value={amountOne}
+          value={Number(amountOne)}
           amountChange={handelAmountOneChange}
           currencyChange={handelcurrencyOneChange}
           currencyRates={currencyRates}
@@ -120,7 +130,7 @@ const Converter = () => {
           />
         </div>
         <CurrencyInput
-          value={amountTwo}
+          value={Number(amountTwo)}
           amountChange={handelAmountTwoChange}
           currencyChange={handelcurrencyTwoChange}
           currencyRates={currencyRates}

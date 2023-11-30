@@ -11,15 +11,13 @@ const CurrencyInput = ({
 }) => {
   const theme = useTheme();
 
-  const selectStyles = {
+      const selectStyles = {
     control: (base, state) => ({
       ...base,
       border: 0,
       // This line disable the blue border
       boxShadow: 'none',
-      // '&:hover': {
-      //   scale: '1.1 !important',
-      // },
+
       scale: state.isFocused ? '1.1' : '1',
     }),
     option: (base, state) => ({
@@ -61,8 +59,8 @@ const CurrencyInput = ({
 };
 
 CurrencyInput.propTypes = {
-  value: PropTypes.string,
-  currencyRates: PropTypes.array,
+  value: PropTypes.number,
+  currencyRates: PropTypes.object,
   currencyChange: PropTypes.func,
   amountChange: PropTypes.func,
   selected: PropTypes.object,
