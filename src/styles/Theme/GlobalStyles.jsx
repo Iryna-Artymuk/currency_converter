@@ -10,7 +10,10 @@ export const GlobalStyle = createGlobalStyle`
     font-size: 16px;
     font-weight:500;
     margin: 0;
-    background-color: ${({ theme }) => theme.colors.bodyBackground};
+   
+
+background: rgb(228,2,82);
+background: linear-gradient(56deg, rgba(228,2,82,1) 0%, rgba(121,9,84,1) 51%);
 }
 
  

@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
-
-import { StyledConverter, StyledForm, StyledTitel } from './StyledConverter';
-import CurrencyInput from '../CurrencyInput/CurrencyInput';
 import axios from 'axios';
+
+import Sppiner from '../Spinner/Sppiner';
+import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import { StyledConverter, StyledForm, StyledTitel } from './StyledConverter';
+import Time from '../TimeStamp/Time';
+
+import CurrencyInput from '../CurrencyInput/CurrencyInput';
 // const API_KEY = '52b45716cb0538baefb5f40db1764096';
-const API_URL = `http://data.fixer.io/api/latest?access_key=52b45716cb0538baefb5f40db1764096a&base  =USD&symbols = USD,UAN,EUR,PLN,`;
+const API_URL = `http://data.fixer.io/api/latest?access_key=52b45716cb0538baefb5f40db1764096&base  =USD&symbols = USD,UAN,EUR,PLN,`;
 const Converter = () => {
   const [amountOne, setAmountOne] = useState();
+
   const [amountTwo, setAmountTwo] = useState();
 
   const [currencyOne, setCurrencyOne] = useState({
@@ -18,27 +23,29 @@ const Converter = () => {
     label: 'USD',
   });
   const [currencyRates, setCurrencyRates] = useState([]);
+  const [timeStamp, setTimeStamp] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  console.log('error: ', error);
 
   useEffect(() => {
     const getCurrency = async () => {
       try {
         setIsLoading(true);
         const res = await axios.get(API_URL);
-        console.log('res : ', res);
 
+        setTimeStamp(res.data.timestamp);
         setCurrencyRates(res.data.rates);
+
         if (res.data.success === false) {
-          setIsLoading(false);
           throw new Error(
-            "can't get exchange rate data, please try again later"
+            'exchange rate data cannot be retrieved, please try again later'
           );
         }
         setIsLoading(false);
       } catch (error) {
         setError(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -83,16 +90,16 @@ const Converter = () => {
   };
 
   if (isLoading) {
-    return <p>Looading data...</p>;
+    return <Sppiner />;
   }
   if (error) {
-    return <p>{`Sorry, ${error.message}`}</p>;
+    return <ErrorMessage> {error.message}</ErrorMessage>;
   }
 
   return (
     <StyledConverter>
       <StyledTitel> Currency converter </StyledTitel>
-
+      <Time timeStamp={timeStamp} />
       <StyledForm>
         <CurrencyInput
           value={amountOne}
@@ -102,7 +109,13 @@ const Converter = () => {
           setOptions={setCurrencyOne}
           selected={currencyOne}
         />
-
+        <div>
+          <img
+            width="50"
+            src="https://img.icons8.com/pulsar-line/96/conversion-currencies.png"
+            alt="conversion-currencies"
+          />
+        </div>
         <CurrencyInput
           value={amountTwo}
           amountChange={handelAmountTwoChange}
