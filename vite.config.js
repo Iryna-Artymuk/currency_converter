@@ -13,8 +13,6 @@ export default defineConfig({
     },
   },
   plugins: [react()],
-  base: '/currency_converter/',
-  define: {
-  
-  },
+  base: '/currency_converter',
+  define: {},
 });

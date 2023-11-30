@@ -8,7 +8,7 @@ import Time from '../TimeStamp/Time';
 
 import CurrencyInput from '../CurrencyInput/CurrencyInput';
 // const API_KEY = '52b45716cb0538baefb5f40db1764096';
-const API_URL = `https://data.fixer.io/api/latest?access_key=52b45716cb0538baefb5f40db1764096&base  =USD&symbols = USD,UAN,EUR,PLN,`;
+const API_URL = `https://v6.exchangerate-api.com/v6/72f5042a3ed8d5c12026aab6/latest/USD`;
 const Converter = () => {
   const [amountOne, setAmountOne] = useState();
 
@@ -23,6 +23,8 @@ const Converter = () => {
     label: 'USD',
   });
   const [currencyRates, setCurrencyRates] = useState([]);
+  console.log('currencyRates: ', currencyRates);
+
   const [timeStamp, setTimeStamp] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,15 +34,16 @@ const Converter = () => {
       try {
         setIsLoading(true);
         const res = await axios.get(API_URL);
+        console.log('res : ', res.data);
 
-        setTimeStamp(res.data.timestamp);
-        setCurrencyRates(res.data.rates);
+        setTimeStamp(res.data.time_last_update_unix);
+        setCurrencyRates(res.data.conversion_rates);
 
-        if (res.data.success === false) {
-          throw new Error(
-            'exchange rate data cannot be retrieved, please try again later'
-          );
-        }
+        // if (res.data.success === false) {
+        //   throw new Error(
+        //     'exchange rate data cannot be retrieved, please try again later'
+        //   );
+        // }
         setIsLoading(false);
       } catch (error) {
         setError(error);
