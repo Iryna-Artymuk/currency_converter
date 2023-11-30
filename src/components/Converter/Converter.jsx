@@ -8,7 +8,7 @@ import Time from '../TimeStamp/Time';
 
 import CurrencyInput from '../CurrencyInput/CurrencyInput';
 // const API_KEY = '52b45716cb0538baefb5f40db1764096';
-const API_URL = `http://data.fixer.io/api/latest?access_key=52b45716cb0538baefb5f40db1764096&base  =USD&symbols = USD,UAN,EUR,PLN,`;
+const API_URL = `https://data.fixer.io/api/latest?access_key=52b45716cb0538baefb5f40db1764096&base  =USD&symbols = USD,UAN,EUR,PLN,`;
 const Converter = () => {
   const [amountOne, setAmountOne] = useState();
 
